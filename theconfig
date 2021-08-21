@@ -1,18 +1,15 @@
 #!/bin/bash
 
-## config script for fedora / redhat.
+## config script for fedora / redhat / centos / rocky.
 
 # turn on / off for debug
 #set -x
 
 ##  These define paths  ##
 ##----------------------##
-alerts=/home/rxlx/bin/logs
-data=/home/rxlx/bin/data
-scripts=/home/rxlx/bin/scripts
-ssh=/home/rxlx/.ssh
-plots=$data/plots
-graphs=$plots/graphs
+alerts=$HOME/bin/logs
+data=$HOME/bin/data
+scripts=$HOME/bin/scripts
 
 
 ## config log  ##
@@ -32,7 +29,7 @@ ipv4 () {
 }
 
 fwl () {
-  firewall-cmd --state
+  sudo firewall-cmd --state
 }
 
 #get the gateway
