@@ -13,6 +13,7 @@ chmod +x ~/bin/theconfig
 vi ~/.bashrc
 (at the very bottom of the file add the following line)
 source ~/bin/theconfig
+rm -rf ~/tmp/
 ```
 <br>
 there are a few python scripts that exist in ~/bin/scripts/ that are dependencies. if you want them, contact me or open an issue.
