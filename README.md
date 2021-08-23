@@ -2,8 +2,9 @@
 
 simple shell script containing semi-useful commands for redhat/redhat-like systems(doesnt seem to work in zsh environment)
 
-This is also where I keep all my compiled binaries that dont need to be in /opt/
-Needs to be executable and on your path. for easy install run (as non root user):
+this is also where I keep all my compiled binaries that dont need to be in /opt/
+<br>
+needs to be executable and on your path. for easy install run (as non root user):
 
 ```bash
 mkdir ~/bin/
