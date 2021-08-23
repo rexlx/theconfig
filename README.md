@@ -1,8 +1,7 @@
 # theconfig
+simple shell script containing semi-useful commands as well as a collection of python scripts.
 
-simple shell script containing semi-useful commands for redhat/redhat-like systems(doesnt seem to work in zsh environment)
-
-this is also where I keep all my compiled binaries that dont need to be in /opt/
+this is also where I keep all my compiled binaries.
 <br>
 needs to be executable and on your path. for easy install run (as non root user):
 
