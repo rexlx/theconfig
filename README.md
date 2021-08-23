@@ -8,7 +8,7 @@ mkdir ~/bin/
 mkdir ~/tmp/
 cd ~/tmp/
 git clone https://github.com/rexlx/theconfig.git
-cp theconfig/theconfig ~/bin/
+mv theconfig/bin/* ~/bin/
 chmod +x ~/bin/theconfig
 vi ~/.bashrc
 (at the very bottom of the file add the following line)
