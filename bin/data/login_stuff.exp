@@ -1,0 +1,2 @@
+journalctl -u 'systemd-logind'
+journalctl -r /usr/sbin/sshd

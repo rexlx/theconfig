@@ -1,0 +1,112 @@
+#!/bin/bash
+
+###                                                             ###
+# tcWizard is a script that helps create traffic delay and packet #
+# loss. The current version is: 1.0.0                             #
+###-------------------------------------------------------------###
+#  for questions contact rex fitzhugh @ rfitzhugh@broadsoft.com   #
+###-------------------------------------------------------------###
+
+##-uncomment the line below to turn on debug mode
+#set -x
+
+##-defines the default interface and userid
+IFACE=$(route | grep 'default' | awk '{print $8}')
+ID=$(id -u)
+
+##-determines user permissions
+if [[ $ID != 0 ]]; then
+  clear
+  echo -e "\n\nThis script may require elevated permissions!!\n"
+else
+  clear
+fi
+
+##-just greps for IPs
+grip () {
+  grep -E -o '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}'
+}
+
+##-Makes things just kind of prettier
+center() {
+  termwidth="$(tput cols)"
+  padding="$(printf '%0.1s' ={1..500})"
+  printf '%*.*s %s %*.*s\n' 0 "$(((termwidth-2-${#1})/2))" \
+  "$padding" "$1" 0 "$(((termwidth-1-${#1})/2))" "$padding"
+}
+
+##-a welcome banner
+center "WELCOME TO THE TC WIZARD!"
+
+##-This is where the bulk of the work happens. For questions about this contact
+##-rfitzhugh@broadsoft.com
+set (){
+  tc qdisc del dev $IFACE root
+  tc qdisc add dev $IFACE root handle 1: prio
+  echo -e "\n\nWould you like to add delay?[y/n]"
+  read choice1
+  if [[ $choice1 == y ]]; then
+    filter=1
+    echo -e "\nEnter your desired delay time in this fashion: 25ms"
+    read delay1
+  elif [[ $choice1 == n ]]; then
+    filter=2
+    echo "Okay!"
+  else
+    echo -e "\nThat wasn't an option! Exiting..."
+  fi
+  echo -e "\n\nWould you like to add loss?[y/n]"
+  read choice2
+  if [[ $choice2 == y ]]; then
+    if [[ $filter == 1 ]]; then
+      filter=3
+    else
+      filter=4
+    fi
+    echo -e "\nEnter your desired loss in this fashion: 10%"
+    read loss1
+  elif [[ $choice2 == n ]]; then
+    if [[ $filter == 1 ]]; then
+      filter=5
+    else
+      filter=6
+    fi
+  else
+    echo -e "\nThat wasn't an option! Exiting..."
+  fi
+  echo -e "\nEnter the Target IP(s) like so: 10.16.180.10/32"
+  read target1
+  center "using $delay1 delay against $target1 with $loss1 loss"
+  if [[ $filter == 5 ]]; then
+    tc qdisc add dev $IFACE parent 1:3 handle 30: netem delay $delay1
+    moveon=y
+  elif [[ $filter == 4 ]]; then
+    tc qdisc add dev $IFACE parent 1:3 handle 30: netem loss $loss1
+    moveon=y
+  elif [[ $filter == 3 ]]; then
+    tc qdisc add dev $IFACE parent 1:3 handle 30: netem delay $delay1 loss $loss1
+    moveon=y
+  elif [[ $filter == 6 ]]; then
+    echo "No Values to pass to tc..."
+    moveon=n
+  else
+    echo -e "Unexpected error occured, filter is $filter"
+  fi
+  if [[ $moveon == n ]]; then
+    echo -e "\n\nNo values to pass!!! exiting..."
+  else
+    tc filter add dev $IFACE protocol ip parent 1:0 prio 3 u32 match ip dst $target1 flowid 1:3
+    echo -e "\nPinging target for verification..."
+    tgt=$(echo -e $target1 | grip)
+    ping -q -c 10 $tgt
+  fi
+  return
+}
+set
+
+stop (){
+	tc qdisc del dev $IFACE root
+}
+
+$@
+

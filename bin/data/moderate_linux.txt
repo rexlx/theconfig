@@ -1,0 +1,239 @@
+
+@@@@@@@@@@@@@@@@
+@@@ Moderate @@@
+@@@@@ Linux @@@@
+@@@@@@@@@@@@@@@@
+
+Moderate Linux is a Linux command line cheat sheet. While some commands
+are very basic, and others more advanced, most are just moderate. 
+
+Rex Fitzhugh
+
+---------------------------
+1. view user info
+---------------------------
+w
+who
+last
+users
+whoami
+
+---------------------------
+2. view processes 
+---------------------------
+ps -ef | grep (process-name-here) 		#view detailed info
+ps -A						#all processes
+ps -C (libvirtd) -o pid=			#find PID of name
+ps -p (10874) -o comm=				#find name of PID
+ps -auxf | sort -nr -k 3 | head -10		#top 10 cpu
+ps -auxf | sort -nr -k 4 | head -10		#top 10 mem
+
+---------------------------
+3. hardware stuff
+---------------------------
+
+____________
+a. cpu stuff
+
+cat /proc/cpuinfo
+cat /sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq  #Show max freq of cpu core
+lscpu | grep -i -E  "^CPU\(s\):|core|socket"	#one way to check if hyperthreading is on
+
+_______________
+b. memory stuff
+
+cat /proc/meminfo
+
+______________________
+c. ethernet/wifi stuff
+
+nmcli radio wifi					#show wifi card status
+nmcli radio wifi <on|off>
+nmcli device wifi list					#show available access points
+nmcli device wifi connect <SSID> password <password>	#connect to network
+https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/Networking_Guide/sec-Using_the_NetworkManager_Command_Line_Tool_nmcli.html
+
+iwconfig						#more wifi info
+iw list							#show detailed card info
+
+________
+d. model
+
+dmidecode | grep -A3 '^System Information'                 #Show machine's product info
+
+
+---------------------------
+4. brace expansion
+---------------------------
+echo -e hostname_{2..254}"\n" > dns
+cat /proc/cpuinfo | ssh root@192.168.0.94 "nl >> /home/remotelog.txt"
+
+**example port-range expansion, used with firewalld script:
+
+echo 270{00..15}/udp | sed 's/ /\n/g' > Tcmds.txt
+echo 270{20..39}/tcp | sed 's/ /\n/g' >> Tcmds.txt
+
+---------------------------
+5. stream editing / sed
+---------------------------
+sed -i 's/Nmap scan report for//g' /home/test/ports.txt         #Replace string with nothing
+sed -i '/Host is/D' /home/test/ports.txt                        #Delete entire line if it matches a string
+sed "s/^[ \t]*//" -i testReport.txt                             #Delete leading white spaces
+sed -i '15i\foobar\' someFile.txt
+
+
+---------------------------
+6. file xfer
+---------------------------
+rsync -avh --update /Bstor/ svr:/storage/ --exclude "Videos" --exclude "Movies" --exclude "images" --exclude "Pictures" --exclude "Music" --progress
+
+rsync -avh --update -e "ssh -p 40810" ./bin/ rxlx@rxcl2:/home/rxlx/bin/ --delete --progress
+
+---------------------------
+7. analyze slow boot
+---------------------------
+systemd-analyze        #Show boot time
+systemd-analyze blame  #Show how long each boot step took
+
+
+---------------------------
+8. network stuff
+---------------------------
+
+
+_____________
+I.ip commands (https://access.redhat.com/sites/default/files/attachments/rh_ip_command_cheatsheet_1214_jcs_print.pdf)
+-------------
+____________________
+a. show ip addresses
+
+ip a
+
+_________________________
+b. interface manipulation
+
+ip link set eth1 down
+ip -s link                 #get interface stats
+
+__________
+c. routing
+
+ip route		           #shows routes
+ip route get (8.8.8.8)     #shows how the machine gets to a certain address
+ip route add (default) via 192.168.1.1 dev eth1
+
+_________________
+d. show neighbors
+
+ip neigh
+
+__________________
+II.network manager
+------------------
+
+__________
+a. get gui
+
+nm-connection-editor  #workstation only command
+
+---------------------------
+9. mass nslookup
+---------------------------
+______________________
+a. ip to hostname ipv4
+
+for ip in $(cat ips.txt); do nslookup $ip; done >> names.txt
+
+___________________
+b. hostname to ipv6
+
+for ip in $(cat 6names.txt); do nslookup -query=AAAA $ip; done >> names.txt
+
+
+---------------------------
+10. Password to hash
+---------------------------
+python -c 'import crypt; print crypt.crypt("your_pass_here", "$6$random_salt")'
+|or|
+openssl passwd -1 -salt xyz
+
+
+---------------------------
+11. check video cards
+---------------------------
+lspci | grep VGA        #caps are important
+
+
+---------------------------
+12. vim tricks
+---------------------------
+:g/YOUR-PATTERN-HERE/d	#deletes every line containing your pattern
+:g/^\s*$/d		#deletes lines with white space or are empty
+:v/error\|warn\|fail/d	#delete all except mentioned
+:%s/foo/bar/g		#replaces all foo for bar
+
+
+---------------------------
+13. TCP flaw (2016) workaround
+---------------------------
+
+in /etc/sysctl.conf-->>
+net.ipv4.tcp_challenge_ack_limit = 999999999
+sysctl -p			#reload kernel settings
+
+
+---------------------------
+14. manipulating cloumns 
+---------------------------
+cut -c44-58 file.txt >> outFile.txt
+
+---------------------------
+15. encryption
+---------------------------
+___________________
+a. password encrypt
+
+gpg -c test.txt
+gpg -o output.txt test.txt.gpg
+
+
+---------------------------
+16. check NFS connections
+---------------------------
+
+netstat -an | grep 2049 | sort | nl >> /home/connected-hosts.txt
+
+---------------------------
+17. sharing keys
+---------------------------
+
+ssh-keygen -t rsa
+ssh-copy-id -i ~/.ssh/id_rsa.pub user@host
+
+---------------------------
+18. all hail grep
+---------------------------
+_______________
+a. ip addresses
+
+grep -E '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' /etc/hosts
+ip route get 8.8.8.8 | awk '{print $3}' | grep -E '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}'
+
+_________________________
+b. just uncommented lines
+
+grep "^[^#]" scripts/net_tools/dPing_alpha.tcl
+
+---------------------------
+19. Disk Benchmark with fio
+---------------------------
+
+fio --randrepeat=1 --ioengine=libaio --direct=1 --gtod_reduce=1 --name=test --filename=test --bs=4k --iodepth=64 --size=4G --readwrite=randrw --rwmixread=75
+
+---------------------------
+20. misc
+---------------------------
+
+a. make multiple dirs
+mkdir -p /opt/your_cool_api/{data,logs,stats,config}
+

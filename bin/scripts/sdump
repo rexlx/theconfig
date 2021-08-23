@@ -1,0 +1,86 @@
+#!/bin/bash
+
+#set -xv
+
+#!/bin/bash
+
+#set -xv
+
+###                                               ###
+# sdump is a tool for capturing large amounts of    #
+# packet captures quickly, or over extended periods #
+# of time. this tool uses tcpdump to accomplish     #
+# this. you simply need to define a directory limit #
+# (deafult is 1GB), and a packet counter so that    #
+# files know when to roll over (default is 100,000  #
+# packets before roll over) the script should do    #
+# the rest. It will name the file like so:          #
+#                                                   #
+# 1  2  3  4 5  6  7   8                            #
+# |  |  |  | |  |  |   |                            #
+# dump21Mar18:34:48-86.pcap                         #
+#                                                   #
+# 1. base file name                                 #
+# 2. day of the month                               #
+# 3. the month                                      #
+# 4. hour of day in 24 hour format                  #
+# 5. minute of hour                                 #
+# 6. second of minute                               #
+# 7. sequence number, in this example, it is the    #
+#    86th file to have been captured                #
+# 8. file extension                                 #
+###-----------------------------------------------###
+#       for questions contact rex fitzhugh @        #
+#       rfitzhugh@broadsoft.com                     #
+####----------------------------------------------###
+
+source ~/bin/theconfig
+
+# defines directory to capture in
+
+limit () {
+        du -s $labprobe/ | awk '{print $1}'
+}
+
+# dates and timestamps the pcap file
+
+name () {
+        date +"%d%b%R%T"
+}
+
+
+# for the cap function, a little bash programming
+# knowledge maybe needed if you wish to modify it
+# however all tcpdump options, arguments and
+# capture filters will work, so just modifying
+# that line should work. it is currently set to
+# capture on any interface until it reaches 
+# 100,000 packets, when it stops. it will then 
+# echo the directory size in KB and start over.
+# view coments below for more info
+
+cap () {
+        COUNT=1
+        while [ $(limit) -lt 1000000 ]; do
+                tcpdump -i $IFACE -c 100000 -w ./foo.pcap
+                mv ./foo.pcap $labprobe/dump$(name)-${COUNT}.pcap
+                COUNT=$(( $COUNT + 1 ))
+                echo -e "\nDirectory is:\t$(limit)kb"
+        done
+        echo -e "\nDirectory has reached its maximum size!\n"
+}
+
+# Uncomment the line below to toggle the cap (capture) function
+# without having to pass the CLI option.
+cap
+
+press () {
+        cd $labprobe
+        zip ./$(name)captures.zip cap*
+}
+
+# Uncomment the line below to toggle the press (compress) function
+# without having to pass the CLI option.
+#press
+
+#$@

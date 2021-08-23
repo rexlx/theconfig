@@ -1,0 +1,12 @@
+numpy
+psutil
+pandas
+matplotlib
+pymongo
+requests
+scipy
+scikit-learn
+beautifulsoup4
+seaborn
+tensorflow
+keras
