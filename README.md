@@ -18,8 +18,6 @@ rm -rf ~/tmp/
 (to confirm install run)
 viconfig
 ```
-<br>
-there are a few python scripts that exist in ~/bin/scripts/ that are dependencies. if you want them, contact me or open an issue.
 <br><hr>
 list of commands it gives you:
 
