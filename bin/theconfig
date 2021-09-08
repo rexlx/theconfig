@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/usr/bin/bash
 
-## config script for fedora / redhat / centos / rocky.
+## config script for fedora / redhat.
 
 # turn on / off for debug
 #set -x
@@ -16,7 +16,7 @@ scripts=$HOME/bin/scripts
 config_log=$alerts/config.log
 
 ptime () {
-  /usr/bin/python3 -c 'import time; print(time.time())'
+  /usr/bin/python3 -c "import time; print(time.time())"
 }
 
 up () {
@@ -24,27 +24,27 @@ up () {
 }
 
 ipv4 () {
-  ip route get 8.8.8.8 | awk '{print $7}' \
-  | grep -E '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}'
+  ip route get 8.8.8.8 | awk "{print $7}" \
+  | grep -E "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}"
 }
 
 fwl () {
-  sudo firewall-cmd --state
+  firewall-cmd --state
 }
 
 #get the gateway
 gw () {
-  ip route get 8.8.8.8 | awk '{print $3}' \
-  | grep -E '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}'
+  ip route get 8.8.8.8 | awk "{print $3}" \
+  | grep -E "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}"
 }
 
 iface () {
-  ip route get 8.8.8.8 | awk '{ print $5 }'
+  ip route get 8.8.8.8 | awk "{ print $5 }"
 }
 
 #get the selinux status
 slnx () {
-  sestatus | grep mode | awk '{ print $3 }'
+  sestatus | grep mode | awk "{ print $3 }"
 }
 
 ## creates a border around a string
@@ -53,11 +53,11 @@ border () {
   local len=${#str}
   local i
   for (( i = 0; i < len + 4; ++i )); do
-    printf '-'
+    printf "-"
   done
   printf "\n $str \n"
   for (( i = 0; i < len + 4; ++i )); do
-    printf '-'
+    printf "-"
   done
   echo
 }
@@ -67,8 +67,8 @@ border () {
 ## NO newlines!
 center() {
   termwidth="$(tput cols)"
-  padding="$(printf '%0.1s' ={1..500})"
-  printf '%*.*s %s %*.*s\n' 0 "$(((termwidth-2-${#1})/2))" \
+  padding="$(printf "%0.1s" ={1..500})"
+  printf "%*.*s %s %*.*s\n" 0 "$(((termwidth-2-${#1})/2))" \
   "$padding" "$1" 0 "$(((termwidth-1-${#1})/2))" "$padding"
 }
 
@@ -88,12 +88,12 @@ ustamp () {
 
 ## grep for IP addresses: cat SOMEFILE | grip
 grip () {
-  grep -E '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}'
+  grep -E "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}"
 }
 
 ## returns JUST ip
 grip-2 () {
-  grep -Eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}'
+  grep -Eo "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}"
 }
 
 ## the address of your DNS
@@ -116,14 +116,14 @@ showport () {
 
 ## show computer model
 model () {
-  sudo dmidecode | grep "Product Name" | tr '\t' '!'
+  sudo dmidecode | grep "Product Name" | tr "\t" "!"
 }
 
 ## shows what virtualization platform VM is running on
 virt () {
   isreal=$(sudo virt-what)
   if $isreal; then
-    echo 'not virtualized'
+    echo "not virtualized"
   else
     echo $isreal
   fi
@@ -170,16 +170,16 @@ log () {
 
 # stuff i always install
 normalize () {
-  sudo dnf -y upgrade || echo -e "\ncouldn't get updates! $(date)" \
+  sudo dnf -y upgrade || echo -e "\ncouldn"t get updates! "$(date)" \
   | tee -a $config_log
   sudo dnf install fedora-workstation-repositories -y 2>> $config_log
-  $(get) dstat fping vim pciutils net-tools bind-utils \
+  "$(get)" dstat fping vim pciutils net-tools bind-utils \
          mlocate nfs-utils sysstat fio ioping tcpdump \
          wireshark sshpass virt-what iperf3 lm_sensors \
          hddtemp nmap python2-devel python3-devel filezilla \
 	 google-chrome-stable arc-theme numix-gtk-theme numix-icon-theme \
 	 numix-icon-theme-circle 2>> $config_log
-  sudo dnf group install 'Development Tools' -y 2>> $config_log
+  sudo dnf group install "Development Tools" -y 2>> $config_log
   /usr/bin/python3 -m pip install --user -r $data/requirements.txt 2>> $config_log
 }
 
@@ -195,7 +195,7 @@ sysinf () {
 }
 
 get-sysinf () {
-  ssh $@ 'python' < $scripts/sysinf.py
+  ssh "$@" "python" < $scripts/sysinf.py
 }
 
 viconfig () {
@@ -213,13 +213,13 @@ top-mem () {
 # new cool-guy gnome feature that wastes resources, kill it with 9
 kill-tracker () {
   while [ true ]; do
-    for i in $(ps -ef | grep tracker | grep -v grep | awk '{ print $2 }'); do
+    for i in $(ps -ef | grep tracker | grep -v grep | awk "{ print $2 }"); do
       if [[ $i -gt 0 ]]; then
         sudo kill -9 $i
 	now=$(dstamp)
 	echo -e "\n$now\tkilled tracker!" >> $config_log
       else
-        pass='true'
+        pass="true"
       fi
     done
     sleep 120
@@ -235,12 +235,12 @@ keep-alive () {
 }
 
 convert-size () {
-  /usr/bin/python3 $scripts/convert_size.py $@
+  /usr/bin/python3 $scripts/convert_size.py "$@"
 }
 
 fix-db () {
   mongod_running=$(systemctl show -p SubState --value mongod)
-  if [[ $mongod_running == 'running' ]]; then
+  if [[ $mongod_running == "running" ]]; then
     echo $(dstamp) >> $config_log
     echo -e "mongod is running!" | tee -a $config_log
   else
@@ -251,21 +251,21 @@ fix-db () {
 }
 
 watch-access () {
-  sudo  tail -f /var/log/httpd/access_log
+  sudo tail -f /var/log/httpd/access_log
 }
 
 getip () {
-  /usr/bin/python3 $scripts/get_ns.py $@
+  /usr/bin/python3 $scripts/get_ns.py "$@"
 }
 
 foreach () {
     for i in ./*; do
-        echo $i; $@ $i
+        echo "$i"; "$@" "$i"
     done
 }
 
 isword () {
-  grep $@ /usr/share/dict/words
+  grep "$@" /usr/share/dict/words
 }
 
 top-ten () {
@@ -273,19 +273,18 @@ top-ten () {
 }
 
 convert-time () {
-  /usr/bin/python3 $scripts/convert_unixtime.py $@
+  /usr/bin/python3 $scripts/convert_unixtime.py "$@"
 }
 
 convert-date () {
-      /usr/bin/python3 $scripts/convert-date.py $@
+      /usr/bin/python3 $scripts/convert-date.py "$@"
 }
 
 add-comma () {
-  /usr/bin/python3 -c "import sys;print('{:,}'.format(int(sys.argv[1])))" $@
+  /usr/bin/python3 -c "import sys;print('{:,}'.format(int(sys.argv[1])))" "$@"
 }
 
 describe () {
   /usr/bin/python3 -c "import sys;import pandas as pd;pd.set_option('display.float_format', lambda x: '%.3f' % x);x = pd.read_csv(sys.argv[1]);print(x.describe())" $@
 }
-
-$@
+"$@"
