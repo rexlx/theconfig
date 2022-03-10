@@ -11,7 +11,7 @@ def get_info():
     with open('/proc/uptime', 'r') as f:
         elapsed_time = f.readline().split()[0]
     u = up.time_in_seconds(elapsed_time)
-    msg = f"User: {uname}\nHostname: {hostname}\nworkdir: {wd}\nUptime:\n{u}"
+    msg = f"user: {uname}\nhostname: {hostname}\nworkdir: {wd}\nuptime:\n{u}"
     print(msg)
 
 
