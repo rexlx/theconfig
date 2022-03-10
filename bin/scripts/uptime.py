@@ -1,7 +1,7 @@
 import sys
 import socket
 
-def seconds_to_readable(seconds):
+def time_in_seconds(seconds):
     """
     A python program that converts seconds to
     human readable times
@@ -36,16 +36,28 @@ def seconds_to_readable(seconds):
             continue
         elif s < 60:
             break
-    converted_time = str(day).rjust(4) + 'd ' + str(hour).rjust(3) + 'h ' \
-                   + str(mins).rjust(3) + 'm ' + str(s).rjust(3) + 's'
-    print(socket.gethostname().ljust(36) + ' ' + converted_time)
+    formated_time = f"{socket.gethostname():<16} {day:>4}d {hour:>4}h {mins:>4}m {s:>4}s"
+    # converted_time = str(day).rjust(4) + 'd ' + str(hour).rjust(3) + 'h ' \
+    #                + str(mins).rjust(3) + 'm ' + str(s).rjust(3) + 's'
+    # print(socket.gethostname().ljust(36) + ' ' + converted_time)
+    return formated_time
 
 
-f = open('/proc/uptime', 'r')
-vals = []
+# def convert_uptime():
+#     with open('/proc/uptime', 'r') as f:
+#         elapsed_time = f.readline()[0]
+#     # for i in f:
+#     #     line = str(i).split()
+#     #     uptime = line[0]
 
-for i in f:
-    line = str(i).split()
-    uptime = line[0]
+#     return time_in_seconds(elapsed_time)
 
-seconds_to_readable(uptime)
+
+def main():
+    with open('/proc/uptime', 'r') as f:
+        elapsed_time = f.readline().split()[0]
+    print(time_in_seconds(elapsed_time))
+
+
+if __name__ == "__main__":
+    main()
