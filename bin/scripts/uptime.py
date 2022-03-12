@@ -36,27 +36,14 @@ def time_in_seconds(seconds):
             continue
         elif s < 60:
             break
-    formated_time = f"{socket.gethostname():<16} {day:>4}d {hour:>4}h {mins:>4}m {s:>4}s"
-    # converted_time = str(day).rjust(4) + 'd ' + str(hour).rjust(3) + 'h ' \
-    #                + str(mins).rjust(3) + 'm ' + str(s).rjust(3) + 's'
-    # print(socket.gethostname().ljust(36) + ' ' + converted_time)
+    formated_time = f"{day:>4}d {hour:>4}h {mins:>4}m {s:>4}s"
     return formated_time
-
-
-# def convert_uptime():
-#     with open('/proc/uptime', 'r') as f:
-#         elapsed_time = f.readline()[0]
-#     # for i in f:
-#     #     line = str(i).split()
-#     #     uptime = line[0]
-
-#     return time_in_seconds(elapsed_time)
 
 
 def main():
     with open('/proc/uptime', 'r') as f:
         elapsed_time = f.readline().split()[0]
-    print(time_in_seconds(elapsed_time))
+    print(f"{socket.gethostname():<25}{time_in_seconds(elapsed_time)}")
 
 
 if __name__ == "__main__":
