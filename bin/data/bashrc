@@ -1,0 +1,67 @@
+#-->ALIASES
+
+# edit .bashrc and reload
+alias "virc"="vim ~/.bashrc;source ~/.bashrc;echo reloaded..."
+
+# follow logs
+alias "log"="sudo journalctl -f"
+
+# show the storage capacity the way i like
+alias "fs"="df -h | grep -v 'loop\|shm\|boot' | grep ^/dev"
+
+# update all systems with send
+alias "upgrade"="cd;bin/send "./update.sh" -f bin/data/main_nodes.txt -t 8655"
+
+# find 15 largest files in ./
+alias "biggons"="find . -type f -printf '%s %p\n' \
+	| sort -nr | head -15"
+
+# show session info
+alias "?"="/usr/bin/python3 \
+	-X pycache_prefix=$HOME/Documents/__pycache__ \
+	$HOME/bin/scripts/session_info.py"
+
+# list everything
+alias "rl"="ls -larth"
+
+# show tcp connections
+alias "ports"="sudo ss -ltpn -4 | grep -v '127.0.0.1'"
+
+# clears the screen
+alias "c"="clear"
+
+# watch https access through proxy
+alias "proxy"="sudo tail -f /var/log/squid/access.log"
+
+# determines if a number is prime
+alias "prime?"="python3 $HOME/bin/scripts/is_prime.py"
+
+# get just cpu temp
+alias "temp"="sensors -f | grep Core"
+
+# kill annoying tracker service
+alias "kill-tracker"="tracker daemon -k"
+
+# backup my local bin
+alias "push"="rsync -avh --update $HOME/bin/ /s/b/dl/bin/ \
+	--delete --progress;rsync -avh --update \
+	/s/b/dl/bin/ surx:/Bstor/bin/ --delete --progress"
+
+# sync up directories
+alias "norm"="rsync -avh --update --exclude 'media' /s/b/ rxfd:/s/b/ --progress;\
+	rsync -avh --update --exclude 'media' /s/b/ surx:/Bstor/ --progress"
+
+# ensure perf gathering tools are running
+alias "perf"="$HOME/bin/send 'ps -ef | grep mongo' \
+	-f $HOME/bin/data/main_nodes.txt -u rxlx -t 600"
+
+# command prompt
+if [ $UID -eq 0 ]
+then
+  PS1='\u \W ! '
+else
+  PS1='\u \W $ '
+fi
+
+export HISTSIZE=10000
+export HISEFILESIZE=10000
