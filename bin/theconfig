@@ -1,53 +1,35 @@
-#!/usr/bin/bash
+#!/bin/bash
 
-## config script for fedora / redhat.
+# config script for fedora / redhat.
 
 # turn on / off for debug
 #set -x
 
-##  These define paths  ##
-##----------------------##
-alerts=$HOME/bin/logs
+#  These define paths  ##
+#----------------------##
+logdir=$HOME/bin/logs
 data=$HOME/bin/data
 scripts=$HOME/bin/scripts
 
 
-## config log  ##
-config_log=$alerts/config.log
+# config log  ##
+config_log=$logdir/config.log
 
-ptime () {
-  /usr/bin/python3 -c "import time; print(time.time())"
+viconfig () {
+  vim ~/bin/theconfig
+  . ~/.bashrc
+  echo reloaded...
 }
 
 up () {
   /usr/bin/python3 $scripts/uptime.py
 }
 
-ipv4 () {
-  ip route get 8.8.8.8 | awk "{print $7}" \
-  | grep -E "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}"
-}
-
 fwl () {
   firewall-cmd --state
 }
 
-#get the gateway
-gw () {
-  ip route get 8.8.8.8 | awk "{print $3}" \
-  | grep -E "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}"
-}
-
-iface () {
-  ip route get 8.8.8.8 | awk "{ print $5 }"
-}
-
-#get the selinux status
-slnx () {
-  sestatus | grep mode | awk "{ print $3 }"
-}
-
-## creates a border around a string
+# creates a border around a string
 border () {
   local str="$*"
   local len=${#str}
@@ -63,8 +45,8 @@ border () {
 }
 
 
-## centers a string and fills whitespace
-## NO newlines!
+# centers a string and fills whitespace
+# NO newlines!
 center() {
   termwidth="$(tput cols)"
   padding="$(printf "%0.1s" ={1..500})"
@@ -72,54 +54,47 @@ center() {
   "$padding" "$1" 0 "$(((termwidth-1-${#1})/2))" "$padding"
 }
 
-## date stamp 11/02/2017 08:07:04 AM
+# date stamp 11/02/2017 08:07:04 AM
 dstamp() {
   date +"%x %r"
 }
 
+# date format for files 2022-04-05_07-14
 fstamp () {
   date +"%F_%H-%M"
 }
 
-## unique stamp 1509628041
+# unique stamp 1509628041
 ustamp () {
   date +"%s"
 }
 
-## grep for IP addresses: cat SOMEFILE | grip
+# grep for IP addresses: cat SOMEFILE | grip
 grip () {
   grep -E "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}"
 }
 
-## returns JUST ip
+# returns JUST ip
 grip-2 () {
   grep -Eo "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}"
 }
 
-## the address of your DNS
+# the address of your DNS
 dns () {
   nslookup google.com | head -n1 | grip-2
 }
 
-## displays network info
-defnet () {
-  echo -e "\nAddress:\t$(ipv4)"
-  echo -e "Interface:\t$(iface)"
-  echo -e "Gateway:\t$(gw)"
-}
 
 showport () {
   sudo  firewall-cmd --list-all
 }
 
-## if hosts file is present, appends to /etc/hosts
-
-## show computer model
+# show computer model
 model () {
   sudo dmidecode | grep "Product Name" | tr "\t" "!"
 }
 
-## shows what virtualization platform VM is running on
+# shows what virtualization platform VM is running on
 virt () {
   isreal=$(sudo virt-what)
   if $isreal; then
@@ -129,63 +104,22 @@ virt () {
   fi
 }
 
-# easy list by last modified
-rl () {
-  ls -lrth
-}
-
-clients () {
-      netstat -an | grep $(ipv4)
-}
-
-
-tshootnet () {
-      echo -e "\n\n\n pinging gateway...\n\n" \
-      && ping -c 4 $(gw) \
-      || echo -e "\ntshootnet $(date):\nError pinging gateway" | tee -a $config_log
-      echo -e "\n\n\n pinging more stuff...\n\n" \
-      && ping -c 4 google.com \
-      || echo -e "\ntshootnet $(date):\nError pinging google" | tee -a $config_log
-      echo -e "\n\ndefault interface\t$(iface)" | tee -a $config_log
-      echo -e "\ngateway\t\t\t$(gw)" | tee -a $config_log
-      echo -e "\n\ndo your routes look alright?\n" \
-      && route -nee \
-      || echo -e "\n\n---\n\nan unexpected error has occured\n\n---\n"
-}
-
-## log stuff ##
-
-logStamp () {
-  center "$(dstamp)" >> $config_log
-}
-
-fastlog () {
-  sudo /usr/bin/tail -f  /var/log/messages
-}
-
-log () {
-      journalctl -f
-}
-
-
 # stuff i always install
 normalize () {
-  sudo dnf -y upgrade || echo -e "\ncouldn"t get updates! "$(date)" \
-  | tee -a $config_log
+  sudo dnf -y upgrade
   sudo dnf install fedora-workstation-repositories -y 2>> $config_log
-  "$(get)" dstat fping vim pciutils net-tools bind-utils \
+  sudo dnf install dstat fping vim pciutils net-tools bind-utils \
          mlocate nfs-utils sysstat fio ioping tcpdump \
          wireshark sshpass virt-what iperf3 lm_sensors \
-         hddtemp nmap python2-devel python3-devel filezilla \
+         hddtemp nmap python3-devel filezilla \
 	 google-chrome-stable arc-theme numix-gtk-theme numix-icon-theme \
 	 numix-icon-theme-circle 2>> $config_log
   sudo dnf group install "Development Tools" -y 2>> $config_log
   /usr/bin/python3 -m pip install --user -r $data/requirements.txt 2>> $config_log
 }
 
-# just some python stuff
 
-## must be root
+# must be root
 clear-ram () {
   sudo sync; echo 3 > /proc/sys/vm/drop_caches
 }
@@ -198,32 +132,13 @@ get-sysinf () {
   ssh "$@" "python" < $scripts/sysinf.py
 }
 
-viconfig () {
-  vim ~/bin/theconfig
-}
-
 mark-user () {
+ clear
  PS1="\e[0;31m[\u \W]\$ \e[m"
 }
 
 top-mem () {
   ps aux | sort -rnk 4 | head
-}
-
-# new cool-guy gnome feature that wastes resources, kill it with 9
-kill-tracker () {
-  while [ true ]; do
-    for i in $(ps -ef | grep tracker | grep -v grep | awk "{ print $2 }"); do
-      if [[ $i -gt 0 ]]; then
-        sudo kill -9 $i
-	now=$(dstamp)
-	echo -e "\n$now\tkilled tracker!" >> $config_log
-      else
-        pass="true"
-      fi
-    done
-    sleep 120
-  done
 }
 
 show-writes () {
@@ -236,18 +151,6 @@ keep-alive () {
 
 convert-size () {
   /usr/bin/python3 $scripts/convert_size.py "$@"
-}
-
-fix-db () {
-  mongod_running=$(systemctl show -p SubState --value mongod)
-  if [[ $mongod_running == "running" ]]; then
-    echo $(dstamp) >> $config_log
-    echo -e "mongod is running!" | tee -a $config_log
-  else
-    echo $(dstamp) >> $config_log
-    echo -e "restarting mongod!" | tee -a $config_log
-    sudo systemctl restart mongod
-  fi
 }
 
 watch-access () {
