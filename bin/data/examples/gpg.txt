@@ -1,0 +1,5 @@
+https://fedoraproject.org/wiki/Creating_GPG_Keys
+
+
+gpg2 --output test.gpg --encrypt --recipient rexreedfitzhugh@gmail.com 20160807_200956.dng
+gpg2 --output test.dng --decrypt test.gpg

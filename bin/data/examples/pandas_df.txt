@@ -1,0 +1,45 @@
+df.drop_duplicates()
+df.duplicated()
+df.duplicated().sum()
+df[df.duplicated()]
+df[~df.duplicated()]
+df.drop_duplicates(inplace=True)
+df.dropna()
+df.dropna(axis=1)
+get_ipython().run_line_magic('pinfo', 'df.fillna')
+df.fillna(value=df.price.mean())
+df.fillna(method='pad')
+df = df.fillna(value=df.price.mean())
+df.in_stock = df.in_stock.map({False: 0, True: 1})
+df.rating = rating_encoder.fit_transform(df.rating)
+rating_encoder.inverse_transform(df.rating)
+df.rating = rating_encoder.inverse_transform(df.rating)
+df.rating = df.rating.map(ordinal_map)
+df.columns
+df.head()
+df.tail()
+df.left.value_counts()
+df.left.value_counts().plot('barh');
+df.left.isnull().sum()
+df.dtypes
+for f in df.columns:
+df.isnull().sum() / len(df) * 100
+fill_value = df.time_spend_company.median()
+df.time_spend_company = df.time_spend_company.fillna(fill_value)
+df.isnull().sum() / len(df) * 100
+mean_per_project = df.groupby('number_project')                    .average_montly_hours.mean()
+fill_values = df.number_project.map(mean_per_project)
+fill_values = df.number_project.map(mean_per_project)
+df.average_montly_hours = df.average_montly_hours.fillna(fill_values)
+assert df.isnull().sum().sum() == 0
+df.left = df.left.map({'no': 0, 'yes': 1})
+df.columns
+df.to_csv('../data/hr-analytics/hr_data_processed.csv', index=False)
+    sns.kdeplot(df.loc[df.left==i, 'satisfaction_level'],
+                df.loc[df.left==i, 'last_evaluation'],
+y = df.left.values
+df.columns
+y = df.left.values
+d = (clf.feature_importances_, df.columns)
+y = df.left.values
+sandra = df.iloc[573]

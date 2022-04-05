@@ -1,0 +1,1 @@
+journalctl -b -u sshd.service | grep -i accepted | grip-2 | sort | uniq -c

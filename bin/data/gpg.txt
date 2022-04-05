@@ -1,5 +1,0 @@
-gpg --gen-key
-gpg --armor --output mypubkey.gpg --export <E-mail that you registered>
-gpg --output test.gpg --encrypt --recipient rexreedfitzhugh@gmail.com 20160807_200956.dng
-gpg --output test.dng --decrypt test.gpg
-gpg --list-secret-keys --keyid-format=long
